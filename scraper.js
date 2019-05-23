@@ -93,8 +93,8 @@ function scrapperTxt(db, site, type){
 			console.log("Found " + elements.length + " elements");
 			for (var i = 0, len = elements.length; i < len; i++) {
 				var item = elements[i].split(":");
-				var ip = item[0].text();
-				var port = parseInt(item[1].text(), 10);
+				var ip = item[0];
+				var port = parseInt(item[1], 10);
 				var code = "";
 				var country = "";
 				var anonymity = "";
