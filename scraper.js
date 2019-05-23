@@ -199,7 +199,7 @@ function run(db) {
 	//scrappers.push(scrapper(db, "http://google-proxy.net/", "google"));
 	//scrappers.push(scrapper(db, "http://free-proxy-list.net/anonymous-proxy.html", "anonymous"));
 	//scrappers.push(scrapperTxt(db, "http://filefab.com/api.php?l=PmxKWgtrKlgMeJa2Z7PTStV5Dgr7Kkn57WZX8lchXd0", "free"));
-	scrappers.push(scrapperHtml(db, "http://proxy-daily.com/", "free"));
+	scrappers.push(scrapperHtml(db, "http://proxyserverlist-24.blogspot.com/feeds/posts/default", "free"));
 	Promise.all(scrappers).then(function() {
 		cleanUp(db).then(function() {
 			readRows(db);
