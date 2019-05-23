@@ -115,7 +115,7 @@ function scrapperTxt(db, site, type){
 function scrapperHtml(db, site, type){
 	return new Promise(function(resolve, reject) {
 		fetchPage(site, function(body) {
-			var regex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}/i;
+			var regex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}/ig;
 			var elements = body.match(regex);
 			console.log()
 			console.log("Found " + elements.length + " elements");
