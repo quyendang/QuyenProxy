@@ -91,8 +91,8 @@ function scrapperTxt(db, site, type){
 			var elements = body.split("\n");
 			console.log()
 			console.log("Found " + elements.length + " elements");
-			elements.each(function() {
-				var item = $(this).split(":");
+			for (var i = 0, len = elements.length; i < len; i++) {
+				var item = elements[i];
 				var ip = $(item[0]).text();
 				var port = parseInt($(item[1]).text(), 10);
 				var code = "";
@@ -105,7 +105,7 @@ function scrapperTxt(db, site, type){
 				var lastchecked = d.toJSON();
 
 				updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
-			});
+			}
 			resolve();
 		});
 	});
