@@ -120,20 +120,24 @@ function scrapperHtml(db, site, type){
 			console.log()
 			console.log("Found " + elements.length + " elements");
 			for (var i = 0, len = elements.length; i < len; i++) {
-			console.log(elements[i]);
-				// var item = elements[i].split(":");
-// 				var ip = item[0];
-// 				var port = parseInt(item[1], 10);
-// 				var code = "";
-// 				var country = "";
-// 				var anonymity = "";
-// 				var google = "";
-// 				var https = "";
-// 
-// 				var d = new Date();
-// 				var lastchecked = d.toJSON();
-// 
-// 				updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
+				try {
+					var item = elements[i].toString().split(":");
+					var ip = item[0].toString();
+					var port = parseInt(item[1], 10);
+					var code = "";
+					var country = "";
+					var anonymity = "";
+					var google = "";
+					var https = "";
+
+					var d = new Date();
+					var lastchecked = d.toJSON();
+
+					updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
+				}
+				catch(error) {
+  					console.error(error);
+				}
 			}
 			resolve();
 		});
