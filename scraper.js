@@ -115,13 +115,14 @@ function scrapperTxt(db, site, type){
 function scrapperHtml(db, site, type){
 	return new Promise(function(resolve, reject) {
 		fetchPage(site, function(body) {
-			var elements = body.split("\n");
+			var regex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}:[0-9]{1,5}/i;
+			var elements = body.match(regex);
 			console.log()
 			console.log("Found " + elements.length + " elements");
-			elements.each(function() {
-				var item = $(this).split(":");
-				var ip = $(item[0]).text();
-				var port = parseInt($(item[1]).text(), 10);
+			for (var i = 0, len = elements.length; i < len; i++) {
+				var item = elements[i].split(":");
+				var ip = item[0];
+				var port = parseInt(item[1], 10);
 				var code = "";
 				var country = "";
 				var anonymity = "";
@@ -132,7 +133,7 @@ function scrapperHtml(db, site, type){
 				var lastchecked = d.toJSON();
 
 				updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
-			});
+			}
 			resolve();
 		});
 	});
@@ -197,8 +198,8 @@ function run(db) {
 	//skipped socks4/socks5
 	//scrappers.push(scrapper(db, "http://google-proxy.net/", "google"));
 	//scrappers.push(scrapper(db, "http://free-proxy-list.net/anonymous-proxy.html", "anonymous"));
-	scrappers.push(scrapperTxt(db, "http://filefab.com/api.php?l=PmxKWgtrKlgMeJa2Z7PTStV5Dgr7Kkn57WZX8lchXd0", "free"));
-	
+	//scrappers.push(scrapperTxt(db, "http://filefab.com/api.php?l=PmxKWgtrKlgMeJa2Z7PTStV5Dgr7Kkn57WZX8lchXd0", "free"));
+	scrappers.push(scrapperHtml(db, "http://proxy-daily.com/", "free"));
 	Promise.all(scrappers).then(function() {
 		cleanUp(db).then(function() {
 			readRows(db);
