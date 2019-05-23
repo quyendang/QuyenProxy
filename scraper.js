@@ -1,3 +1,20 @@
+// var list = await proxy.GetTxtProxy("http://filefab.com/api.php?l=PmxKWgtrKlgMeJa2Z7PTStV5Dgr7Kkn57WZX8lchXd0");
+//                
+//                 var list1 = await proxy.GetTxtProxy("http://rootjazz.com/proxies/proxies.txt");
+//                 var list2 = await proxy.GetHtmlProxy("http://proxyserverlist-24.blogspot.com/feeds/posts/default");
+//                 var list3 = await proxy.GetHtmlProxy("http://sslproxies24.blogspot.in/feeds/posts/default");
+//                 var list4 = await proxy.GetHtmlProxy("http://www.live-socks.net/feeds/posts/default");
+//                 var list5 = await proxy.GetHtmlProxy("http://proxyape.com/");
+//                 var list6 = await proxy.GetHtmlProxy("http://sock5us.blogspot.com/");
+//                 var list7 = await proxy.GetHtmlProxy("https://anotepad.com/notes/aa3fj6");
+//                 var list8 = await proxy.GetHtmlProxy("http://proxy-daily.com/");
+//                 var list9 = await proxy.GetHtmlProxy("https://www.dailyfreeproxy.com/feeds/posts/default");
+//                 var list10 = await proxy.GetTxtProxy("https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks.txt");
+//                 var list11 = await proxy.GetTxtProxy("https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=10000&country=all&ssl=all&anonymity=all");
+//                 var list12 = await proxy.GetTxtProxy("https://api.proxyscrape.com/?request=getproxies&proxytype=socks4&timeout=10000&country=all");
+//                 var list13 = await proxy.GetTxtProxy("https://api.proxyscrape.com/?request=getproxies&proxytype=socks5&timeout=10000&country=all");
+
+
 console.log("Hello!");
 
 var util = require("util");
@@ -68,6 +85,61 @@ function fetchPage(url, callback) {
 	});
 }
 
+function scrapperTxt(db, site, type){
+	return new Promise(function(resolve, reject) {
+		fetchPage(site, function(body) {
+			var elements = body.split("\n");
+			console.log()
+			console.log("Found " + elements.length + " elements");
+			elements.each(function() {
+				var item = $(this).split(":");
+				var ip = $(item[0]).text();
+				var port = parseInt($(item[1]).text(), 10);
+				var code = "";
+				var country = "";
+				var anonymity = "";
+				var google = "";
+				var https = "";
+
+				var d = new Date();
+				var lastchecked = d.toJSON();
+
+				updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
+			});
+			resolve();
+		});
+	});
+}
+
+
+function scrapperHtml(db, site, type){
+	return new Promise(function(resolve, reject) {
+		fetchPage(site, function(body) {
+			var elements = body.split("\n");
+			console.log()
+			console.log("Found " + elements.length + " elements");
+			elements.each(function() {
+				var item = $(this).split(":");
+				var ip = $(item[0]).text();
+				var port = parseInt($(item[1]).text(), 10);
+				var code = "";
+				var country = "";
+				var anonymity = "";
+				var google = "";
+				var https = "";
+
+				var d = new Date();
+				var lastchecked = d.toJSON();
+
+				updateRow(db, ip, port, code, country, anonymity, google, https, lastchecked, type);
+			});
+			resolve();
+		});
+	});
+}
+
+
+
 function scrapper(db, site, type) {
 	return new Promise(function(resolve, reject) {
 		fetchPage(site, function(body) {
@@ -117,15 +189,16 @@ function scrapper(db, site, type) {
 
 function run(db) {
 	var scrappers = [];
-	scrappers.push(scrapper(db, "http://free-proxy-list.net/", "free"));
+	//scrappers.push(scrapper(db, "http://free-proxy-list.net/", "free"));
 	//skipped web proxies
-	scrappers.push(scrapper(db, "http://sslproxies.org/", "ssl"));
-	scrappers.push(scrapper(db, "http://us-proxy.org/", "us"));
-	scrappers.push(scrapper(db, "http://free-proxy-list.net/uk-proxy.html", "uk"));
+	//scrappers.push(scrapper(db, "http://sslproxies.org/", "ssl"));
+	//scrappers.push(scrapper(db, "http://us-proxy.org/", "us"));
+	//scrappers.push(scrapper(db, "http://free-proxy-list.net/uk-proxy.html", "uk"));
 	//skipped socks4/socks5
-	scrappers.push(scrapper(db, "http://google-proxy.net/", "google"));
-	scrappers.push(scrapper(db, "http://free-proxy-list.net/anonymous-proxy.html", "anonymous"));
-
+	//scrappers.push(scrapper(db, "http://google-proxy.net/", "google"));
+	//scrappers.push(scrapper(db, "http://free-proxy-list.net/anonymous-proxy.html", "anonymous"));
+	scrappers.push(scrapperTxt(db, "http://filefab.com/api.php?l=PmxKWgtrKlgMeJa2Z7PTStV5Dgr7Kkn57WZX8lchXd0", "free"));
+	
 	Promise.all(scrappers).then(function() {
 		cleanUp(db).then(function() {
 			readRows(db);
