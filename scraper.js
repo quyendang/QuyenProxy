@@ -47,17 +47,29 @@ function fetchPage(url, callback) {
 
 function scrapper(db, site, code) {
 	return new Promise(function(resolve, reject) {
-		fetchPage(site, function(body) {
-			var json = body.split('window["ytInitialData"] = ').pop().split('window["ytInitialPlayerResponse"]')[0];
-			json = json.replace('}}]}}}}}}};','}}]}}}}}}}');
-			var jsonData = JSON.parse(json);
-			var link = jsonData.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.subMenu.channelListSubMenuRenderer.contents[0].channelListSubMenuAvatarRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
-			var linkData = 'https://www.youtube.com' + link;
-			console.log()
-			console.log(linkData);
-			updateRow(db, code, linkData);
-			resolve();
+		try {
+			fetchPage(site, function(body) {
+			try {
+				var json = body.split('window["ytInitialData"] = ').pop().split('window["ytInitialPlayerResponse"]')[0];
+				json = json.replace('}}]}}}}}}};','}}]}}}}}}}');
+				var jsonData = JSON.parse(json);
+				var link = jsonData.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.subMenu.channelListSubMenuRenderer.contents[0].channelListSubMenuAvatarRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
+				var linkData = 'https://www.youtube.com' + link;
+				console.log()
+				console.log(linkData);
+				updateRow(db, code, linkData);
+				resolve();
+			}
+			catch (e) {
+  				console.log(e);
+  				resolve();
+			}
 		});
+		}
+		catch (e) {
+  			console.log(e);
+  			resolve();
+		}
 	});
 }
 
