@@ -57,11 +57,12 @@ function scrapper(db, site, code) {
 		try {
 			fetchPage(site, function(body) {
 			try {
-				var json = body.split('window["ytInitialData"] = ').pop().split('window["ytInitialPlayerResponse"]')[0];
-				json = json.replace('}}]}}}}}}};','}}]}}}}}}}');
-				var jsonData = JSON.parse(json);
-				var link = jsonData.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.subMenu.channelListSubMenuRenderer.contents[0].channelListSubMenuAvatarRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
-				var linkData = 'https://www.youtube.com' + link;
+				//var json = body.split('window["ytInitialData"] = ').pop().split('window["ytInitialPlayerResponse"]')[0];
+				//json = json.replace('}}]}}}}}}};','}}]}}}}}}}');
+				//var jsonData = JSON.parse(json);
+				//var link = jsonData.contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.subMenu.channelListSubMenuRenderer.contents[0].channelListSubMenuAvatarRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url;
+				var link = body.split('4gIuCggvbS8wNHJ').pop().split('","webPageType')[0];
+				var linkData = 'https://www.youtube.com/feed/trending?bp=4gIuCggvbS8wNHJ' + link;
 				console.log()
 				console.log(linkData);
 				updateRow(db, code, linkData);
