@@ -90,7 +90,7 @@ function scrapper(db, site, code) {
 
 function run(db) {
 	var scrappers = [];
-	fetchPage(site, function(body) {
+	fetchPage('https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json', function(body) {
 			var jsonData = JSON.parse(body);
 			for (var i = 0; i < jsonData.length; i++) {
     			var item = jsonData[i];
