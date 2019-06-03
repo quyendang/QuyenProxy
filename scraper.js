@@ -63,7 +63,7 @@ function run(db) {
 			var jsonData = JSON.parse(body);
 			for (var i = 0; i < jsonData.length; i++) {
     			var item = jsonData[i];
-    			scrappers.push(scrapper(db, "https://m.youtube.com/feed/trending?&hl=en&client=mv-google&gl="+ item.Code, item.Code));
+    			scrappers.push(scrapper(db, "https://youtube.com/feed/trending?&hl=en&client=mv-google&gl="+ item.Code, item.Code));
 			}
 			Promise.all(scrappers).then(function() {
 				db.close();
