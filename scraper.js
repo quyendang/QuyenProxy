@@ -8,7 +8,6 @@ var sqlite3 = require("sqlite3").verbose();
 function initDatabase(callback) {
 	var db = new sqlite3.Database("data.sqlite");
 	db.serialize(function() {
-		//db.run("DROP TABLE IF EXISTS data");
 		db.run("CREATE TABLE IF NOT EXISTS data (code TEXT PRIMARY KEY, link TEXT)");
 		callback(db);
 	});
@@ -18,42 +17,12 @@ function updateRow(db, code, link) {
 	var statementIn = db.prepare("INSERT OR IGNORE INTO data VALUES (?, ?)");
 	statementIn.run(code, link);
 	statementIn.finalize();
-
-	var statementUp = db.prepare("UPDATE data SET link = ? WHERE code LIKE ?");
-	statementUp.run(link, code);
-	statementUp.finalize();
-}
-
-function pad(str, max, char) {
-	str = str.toString();
-	return str.length < max ? pad(char + str, max, char) : str;
 }
 
 function readRows(db) {
-	db.each("SELECT rowid AS code, link FROM data", function(err, row) {
-		if (err) return console.log("Error", util.inspect(err));
-		//console.log("[" + pad(row.id.toString(), 4, "0") + "] " + pad(row.type, 9, " ") + " - " + pad(row.ip, 15, " ") + ":" + row.port.toString() + (new Array(Math.max(6 - row.port.toString().length, 0)).join(" ")) + " - " + new Date(row.lastchecked).toGMTString());
-	});
-}
-
-function cleanUp(db) {
-	return new Promise(function(resolve, reject) {
-		db.all("SELECT * FROM data", function(err, rows) {
-			if (err) {
-				reject();
-				return console.log("Error", util.inspect(err));
-			}
-			rows.filter(function(row) {
-				var d = new Date(row.lastchecked);
-				var r;
-				if (!(r = (d.setDate(d.getDate() + 7)) >= new Date())) {
-					//console.log("Removed proxy", pad(row.type, 9, " ") + " - " + pad(row.ip, 15, " ") + ":" + row.port.toString() + (new Array(Math.max(6 - row.port.toString().length, 0)).join(" ")) + " - " + new Date(row.lastchecked).toGMTString());
-					db.run("DELETE FROM data WHERE code = ?", row.code);
-				}
-				return r;
-			});
-			resolve();
-		});
+	// Read some data.
+	db.each("SELECT rowid AS id, code, link FROM data", function(err, row) {
+		console.log(row.id + ": " + row.code + "|" + link);
 	});
 }
 
@@ -79,7 +48,7 @@ function fetchPage(url, callback) {
 function scrapper(db, site, code) {
 	return new Promise(function(resolve, reject) {
 		fetchPage(site, function(body) {
-			var linkData = body.split('?bp=').pop().split('","')[0];
+			var linkData = 'https://www.youtube.com/feed/trending?bp=' + body.split('?bp=').pop().split('","')[0];
 			console.log()
 			console.log(linkData);
 			updateRow(db, code, linkData);
@@ -89,19 +58,16 @@ function scrapper(db, site, code) {
 }
 
 function run(db) {
-	var scrappers = [];
 	fetchPage('https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json', function(body) {
+			var scrappers = [];
 			var jsonData = JSON.parse(body);
 			for (var i = 0; i < jsonData.length; i++) {
     			var item = jsonData[i];
     			scrappers.push(scrapper(db, "https://m.youtube.com/feed/trending?&hl=en&client=mv-google&gl="+ item.Code, item.Code));
 			}
 			Promise.all(scrappers).then(function() {
-				cleanUp(db).then(function() {
-				readRows(db);
+				db.close();
 			});
-			db.close();
-	});
 	});
 }
 
